@@ -160,4 +160,4 @@ resource "azurerm_dashboard" "my-board" {
 ```
 `data.template_file.dash-template` follows the usual pattern to reference existing resources (data = since existing; type = template_file; dash-template = user specified name). `Rendered` is the property name defined by terraform to retrieve the JSON with the replaced values.
 
-There are multiple ways to open the dashboard you created. One way is to open the resource group. There you should have an entry for your dashboard `<your prefix>-dasboard`. Click on the entry. In the overview page you have a link as shown below that taks you directly to your dashboard.
+There are multiple ways to open the dashboard you created. One way is to open the resource group. There you should have an entry for your dashboard `<your prefix>-dashboard`. Click on the entry. In the overview page you have a link as shown below that taks you directly to your dashboard.
