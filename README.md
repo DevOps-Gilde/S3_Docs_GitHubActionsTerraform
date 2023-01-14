@@ -1,5 +1,9 @@
 # DevOps-Hackathon (Azure DevOps/ GitHub Actions)
 
+## Focus
+
+This repo contains the documentation for the **third session** within this DevOps Hackathon. Main focus are the technologies **GitHub Actions** and **Terraform**. [This repo](https://github.com/DevOps-Gilde/S3_Code_GitHubActionsTerraform) contains the assumed code for this documentation.
+
 ## Prerequirements
 
 The following prerequisites are **ONLY REQUIRED** if you don't use in place browser editing:
