@@ -153,9 +153,9 @@ The next two steps ensure that terraform is installed and that our code is at th
 - uses: hashicorp/setup-terraform@v1
 ```
 
-Now we run the standard terraform commands to init the environment and to calcuate the result of the terraform code without actually deploying the resources by terraform plan.
+Now we run the standard terraform commands to init the environment and to calcuate the result of the terraform code without actually deploying the resources by terraform plan. The generated execution plan `terraform plan` is machine readable and can be used in unit test scenarios. Especially if the deployment of a resource takes long this is a great advantage. Native Microsoft languages like `Bicep`don't provide such a feature yet.
 
-The `fmt`command which does static code analysis and checks correct formatting. Normally you would set "`continue-on-error: false`" so you get automatic linting and the pipeline doesnt allow incorrect formatted code. Unfortuately we could not figure out why terraform is complaining about the certain things you introduce later on such as variables. Therefore set "`continue-on-error: true`" to ensure your code is running through. If you figure out what is the correct required formatting let us know, so that we can drop this workaround.
+The `fmt` command which does static code analysis and checks correct formatting. Normally you would set `continue-on-error: false` so you get automatic linting and the pipeline doesnt allow incorrect formatted code. Unfortuately we could not figure out why terraform is complaining about the certain things you introduce later on such as variables. Therefore set `continue-on-error: true` to ensure your code is running through. If you figure out what is the correct required formatting let us know, so that we can drop this workaround.
 
 ```
     ...
@@ -189,7 +189,7 @@ An interesting detail of the `terraform plan` is the way how our secrets are pas
 * `TF_VAR_` is stripped off
 * The remaining part such as `client_id` must be defined as terraform variable
 
-`terraform plan` needs access to the terraform code to be executed. In our case the terraform code is located in a subdirectory why we need to define the "`working-directory`" for **all upcoming Terraform Tasks**. 
+`terraform plan` needs access to the terraform code to be executed. In our case the terraform code is located in a subdirectory why we need to define the `working-directory` for **all upcoming Terraform Tasks** (Location working directory: https://github.com/DevOps-Gilde/S3_Code_GitHubActionsTerraform/tree/main/terraform). 
 
 The setup from the second job is not much different from the first one. Only the terraform commands within the steps differ. 
 ```
