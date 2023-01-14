@@ -11,7 +11,7 @@ The following prerequisites are **ONLY REQUIRED** if you don't use in place brow
 - Visual Studio Code: [download link](
 https://code.visualstudio.com/download)
 
-## Session preparation
+## Session preparation/
 
 We strongly recommend that you carry out the tasks below before the hackathon session starts. It helps you to maximize the time for coding:
 
@@ -26,5 +26,5 @@ The following implementation tasks will expect you:
 4. Setup WebApp Workflow [here](/04_SetupWebsite.md)
 5. **Optional advanced extra task:** Create Monitoring [here](/05_Monitoring.md)
 
-:white_check_mark: We also created a working solution located in the branch [Solution](https://github.com/DevOps-Gilde/S3_Code_GitHubActions/tree/Solution) of your forked repository that covers all tasks except monitoring. 
+:white_check_mark: We also created a working solution located in the branch [Solution](https://github.com/DevOps-Gilde/S3_Code_GitHubActionsTerraform/tree/Solution) of your forked repository that covers all tasks except monitoring. 
 If at any Point you need assistance nevertheless do not hesitate to ask. We are here to Help you.
