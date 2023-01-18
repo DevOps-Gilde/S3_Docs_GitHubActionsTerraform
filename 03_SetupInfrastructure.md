@@ -37,32 +37,31 @@ The full resource name for the app service plan could then be `plan-flopet631`. 
 
 This is the Connection Data needed for the Azure Subscription. The hashtags are placeholders. Copy the values from the teams chat (They are not given to avoid exposure of secrets in the public internet).
 
-Secret:
-AZURE_CREDENTIALS =
-`{
-  "clientId": "#",
-  "clientSecret": "#",
-  "subscriptionId": "#",
-  "tenantId": "#"
-}`
+Secrets:  
+AZURE_AD_CLIENT_ID = \<Service Principal Id>  
+AZURE_AD_CLIENT_SECRET = \<secret>  
+AZURE_SUBSCRIPTION_ID = \<Sub-id>  
+AZURE_AD_TENANT_ID = \<tenant-id>  
 
-`clientId` and `clientSecret` deserve a quick extra explanation. A workflow changes things in your Azure subscription. Of course these changes must be associated with a user so that Azure can determine whether you have the permissions to do so. `clientId` denotes the service principal we created beforehand for you. We gave that user permission for the resource group in which you deploy your Azure services. Of course a user also needs credentials. The value behind `clientSecret` is exactly that.
+
+`AZURE_AD_CLIENT_ID` and `AZURE_AD_CLIENT_SECRET` deserve a quick extra explanation. A workflow changes things in your Azure subscription. Of course these changes must be associated with a user so that Azure can determine whether you have the permissions to do so. `AZURE_AD_CLIENT_ID` denotes the service principal we created beforehand for you. We gave that user permission for the resource group in which you deploy your Azure services. Of course a user also needs credentials. The value behind `AZURE_AD_CLIENT_SECRET` is exactly that.
 
 ### LOC - Geo-Location of the resources
 
 This is the Azure location (also known as region) where resources are geographical deployed:
 
-Secret:
+Secret:  
 LOC = 
 `westeurope`
+
+> :warning: In case Azure returns an error regarding quota limitation please use a different location like `northeurope`
 
 ### RG - ResourceGroup name
 
 This is the Name of the Resource Group you will be using to Deploy your Website. During the Hackathon you will only have Access to the Following ResourceGroup:
 
-Secret:
-RG = 
-`ws-devops`
+Secret:  
+RG = `ws-devops`
 
 If you want to know more about Resource Groups take a look here:
 https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-portal#what-is-a-resource-group
@@ -71,9 +70,8 @@ https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/manage-
 
 This is the Name of the App Service Plan which needs to be unique in our Subscription.
 
-Secret:
-ASP=
-`plan-<your personal identifier>`
+Secret:  
+ASP= `plan-<your personal identifier>`
 
 If you want to know more about App Service Plans take a look here:
 https://docs.microsoft.com/en-us/azure/app-service/overview
@@ -82,9 +80,8 @@ https://docs.microsoft.com/en-us/azure/app-service/overview
 
 This is the Name of the Web Application which needs to be unique globally. `<your personal identifier>` might be an option but you might have to modify it due to global uniqueness across the entire Azure.
 
-Secret:
-WEBAPP=
-`your web app name`
+Secret:  
+WEBAPP= `<your web app name>`
 
 If you want to know more about WebApps take a look here:
 https://docs.microsoft.com/en-us/azure/app-service/overview
@@ -133,7 +130,7 @@ jobs:
   terraformprepare:
     name: 'Terraform'
     runs-on: ubuntu-latest
-    environment: developement
+    environment: development
  
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
