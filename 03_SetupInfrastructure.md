@@ -27,7 +27,7 @@ To create secrets you first have to navigate to the right place in GitHub (Tab S
 
 <br><img src="./images/secrets_path_to_enter.png" width="900"/>
 
-We all work in the same resource group and that's why we need naming conventions to ensure uniqueness. In our hackathon we will use simplifed ones but [here](https://docs.microsoft.com/de-de/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations) you find recommendations for a real world case. The simplified naming schema we use partially is `<type-name>-<your personal identifier>`. A good idea is to use an akronym infered from your name and a number. If your name is Florian Peters for Example you could choose:
+We all work in the same resource group and that's why we need naming conventions to ensure uniqueness. In our hackathon we will use simplifed ones but [here](https://docs.microsoft.com/de-de/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations) you find recommendations for a real world case. The simplified naming schema we use partially is `<type-name>-<your personal identifier>`. A good idea is to use an akronym inferred from your name and a number. If your name is Florian Peters for Example you could choose:
 
 `flopet631`
 
@@ -100,26 +100,47 @@ The code file can be split in three major parts:
 * Workflow Header
 * Prepare Terraform code execution (init/ plan)
 
-  This step is imlemented as a GitHub Actions job named `terraformprepare`.
+  _This step is implemented as a GitHub Actions job named `terraformprepare`._
 
 * Execute Terraform code (apply)
   
-  This step is imlemented as a GitHub Actions hjob named `terraformapply`.
+  _This step is implemented as a GitHub Actions job named `terraformapply`._
+
+* Destroy Terraform resources (destroy)
+  
+  _This step is implemented as a GitHub Actions job named `terraformdetroy`._
 
 ### Workflow Header
 
-This includes the name (`name`) of the flow, passing our secrets as environment variables (`env`) and the condition under which our worklow is triggered (`on` which specifies manual start).
+This includes the name (`name`) of the flow, passing our secrets as environment variables (`env`) and the condition under which our worklow is triggered (`on` which specifies manual start). When starting the workflow manually you can control enable the input field `destroy`.
 ```
 name: 'Terraform'
  
 on:
-  workflow_dispatch
+  workflow_dispatch:
+    inputs:
+      destroy:
+        description: Destroy Resources
+        default: false
+        type: boolean
+        required: true
 
 env:
+  # Login for azure cli
   ARM_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
   ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
   ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+
+  # Terraform variables
+  TF_VAR_client_id: ${{ secrets.AZURE_AD_CLIENT_ID }}
+  TF_VAR_client_secret: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
+  TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  TF_VAR_tenant_id: ${{ secrets.AZURE_AD_TENANT_ID }}
+  TF_VAR_rg_name: ${{ secrets.RG }}
+  TF_VAR_web_app_name: ${{ secrets.WEBAPP }}
+  TF_VAR_app_service_plan_name: ${{ secrets.ASP }}
+  TF_VAR_location: ${{ secrets.LOC }}
 ```
 ### Prepare Terraform code execution
 
@@ -145,42 +166,32 @@ The next two steps ensure that terraform is installed and that our code is at th
 ...
 # Checkout the repository to the GitHub Actions runner
 - name: Checkout
-  uses: actions/checkout@v2
+  uses: actions/checkout@v3
 
-- uses: hashicorp/setup-terraform@v1
+- uses: hashicorp/setup-terraform@v2
 ```
 
-Now we run the standard terraform commands to init the environment and to calcuate the result of the terraform code without actually deploying the resources by terraform plan. The generated execution plan `terraform plan` is machine readable and can be used in unit test scenarios. Especially if the deployment of a resource takes long this is a great advantage. Native Microsoft languages like `Bicep`don't provide such a feature yet.
+Now we run the standard terraform commands to init the environment and to calculate the result of the terraform code without actually deploying the resources by terraform plan. The generated execution plan `terraform plan` is machine readable and can be used in unit test scenarios. Especially if the deployment of a resource takes long this is a great advantage. Native Microsoft languages like `Bicep` don't provide such a feature yet.
 
-The `fmt` command which does static code analysis and checks correct formatting. Normally you would set `continue-on-error: false` so you get automatic linting and the pipeline doesnt allow incorrect formatted code. Unfortuately we could not figure out why terraform is complaining about the certain things you introduce later on such as variables. Therefore set `continue-on-error: true` to ensure your code is running through. If you figure out what is the correct required formatting let us know, so that we can drop this workaround.
+The `fmt` command which does static code analysis and checks correct formatting.
 
 ```
     ...
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
-    - uses: hashicorp/setup-terraform@v1
+    - uses: hashicorp/setup-terraform@v2
 
     - run: terraform init
     
-    # Normally you would use continue-on-error: false
-    # An unresolveable error in the variables.tf
-    # file requires this workaround so far.
     - name: Terraform fmt
       id: fmt
       run: terraform fmt -check
-      continue-on-error: true
 
     - name: Terraform Plan
       id: plan
       run: terraform plan -no-color
-      env:
-        TF_VAR_client_id: ${{ secrets.AZURE_AD_CLIENT_ID }}
-        TF_VAR_client_secret: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
-        TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        TF_VAR_tenant_id: ${{ secrets.AZURE_AD_TENANT_ID }}
-        TF_VAR_web_app_name: ${{ secrets.WEBAPP }}
 ```
 An interesting detail of the `terraform plan` is the way how our secrets are passed. As stated by `env` each variable is passed as environment variable. For each passed variable a counterpart must be defined within terraform as you will see later. Matching between the variable in the env section and terraform code is done as follows:
 * `TF_VAR_` is stripped off
@@ -192,6 +203,7 @@ The setup from the second job is not much different from the first one. Only the
 ```
  ...
  terraformapply:
+    if: ${{ github.event.inputs.destroy == 'false' }}
     name: 'Terraform Apply'
     needs: [terraformprepare]
     runs-on: ubuntu-latest
@@ -206,25 +218,54 @@ The setup from the second job is not much different from the first one. Only the
     steps:
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       
-    - uses: hashicorp/setup-terraform@v1
+    - uses: hashicorp/setup-terraform@v2
 
     - run: terraform init
     - name: Terraform Apply
       id: apply
       # if: github.ref == 'refs/heads/main'
       run: terraform apply -auto-approve -no-color
-      env:
-        TF_VAR_client_id: ${{ secrets.AZURE_AD_CLIENT_ID }}
-        TF_VAR_client_secret: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
-        TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        TF_VAR_tenant_id: ${{ secrets.AZURE_AD_TENANT_ID }}
-        TF_VAR_web_app_name: ${{ secrets.WEBAPP }}
+...
 ```
 
-The second job needs to wait until the first one completed. Sequential executon is enforced by `needs: [terraform]`.
-The paremeter `-auto-approve` in `terraform apply -auto-approve` ensures that your workflow is not hanging because terraform expects a manual confirmation from the user.
+
+
+The second job needs to wait until the first one completed. Sequential execution is enforced by `needs: [terraform]`. Additionally it is only running, if workflow parameter `destroy` is not activated (`if: ${{ github.event.inputs.destroy == 'false' }}`) when starting the workflow. 
+The parameter `-auto-approve` in `terraform apply -auto-approve` ensures that your workflow is not hanging because terraform expects a manual confirmation from the user.
+
+Finally the third job `terraformdetroy` removes all azure resources created by your terraform code. Destroying the deployed infrastructure is achieved by calling `terraform destroy`
+
+```
+...
+  terraformdestroy:
+    if: ${{ github.event.inputs.destroy == 'true' }}
+    name: 'Terraform Destroy'
+    needs: [terraform]
+    runs-on: ubuntu-latest
+    environment: production
+ 
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: terraform
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v2
+      
+    - uses: hashicorp/setup-terraform@v2
+
+    - run: terraform init
+    
+    - name: Terraform Destroy
+      id: destroy
+      # if: github.ref == 'refs/heads/main'
+      run: terraform destroy -auto-approve -no-color
+```
 
 # 2. Terraform Tasks
 
@@ -247,51 +288,65 @@ terraform {
 
 ### Storage Account
 
-To learn more about Azure Storage Accounts checkout:
-
+To learn more about Azure Storage Accounts checkout:  
 https://docs.microsoft.com/de-de/azure/storage/common/storage-account-overview
 ### Backends
 
-To learn more about Terraform Backends checkout:
+To learn more about Terraform Backends checkout:  
 https://www.terraform.io/docs/language/settings/backends/index.html
 
 ### State
 
-To learn more about the Terraform State Checkout:
+To learn more about the Terraform State Checkout:  
 https://www.terraform.io/docs/language/state/index.html
 
 ## Input variables
 
-In the github actions workflows we passed input parameters to terraform. Currently the counterpart in terraform is missing. It is good practise to declare the input variables for a module (here main.tf) in a separate file. Therefore, add an additional file in the same folder as `main.tf` named `variables.tf`. Add the following code:
+In the github actions workflows we passed input parameters to terraform. Currently the counterpart in terraform is missing. It is good practice to declare the input variables for a module (here main.tf) in a separate file. Therefore, add an additional file in the same folder as `main.tf` named `variables.tf`. Add the following code:
 
 ```
 variable "client_id" {
-  description = "Application id from app registration in azure active directory." 
+  description = "Application id from app registration in azure active directory."
   type        = string
 }
 
 variable "client_secret" {
-  description = "Client secret from app registration in azure active directory." 
+  description = "Client secret from app registration in azure active directory."
   type        = string
 }
 
 variable "subscription_id" {
-  description = "Subscription id of resource group." 
+  description = "Subscription id of resource group."
   type        = string
 }
 
 variable "tenant_id" {
-  description = "Tenant id of subscription." 
+  description = "Tenant id of subscription."
+  type        = string
+}
+
+variable "rg_name" {
+  description = "The name of the resource group."
   type        = string
 }
 
 variable "web_app_name" {
-  description = "The name of the web app." 
+  description = "The name of the web app."
+  type        = string
+}
+
+variable "app_service_plan_name" {
+  description = "The name of the app service plan."
+  type        = string
+}
+
+variable "location" {
+  description = "location where to deploy resources to"
   type        = string
 }
 
 ```
-The variables are needed for the optional monitoring task.
+The variables are needed for the optional monitoring task, too.
 
 ## Data and Resource
 
@@ -301,11 +356,12 @@ So let's add the required code for reading the resource group and its property f
 ```
 #Get resource group
 data "azurerm_resource_group" "wsdevops" {
-  name = "ws-devops"
+  name = var.rg_name
 }
 
 ```
-`name` is a mandatory property in this case. It is needed by terraform to know which resource group you are refering to.
+`name` is a mandatory property in this case. It is needed by terraform to know which resource group you are referring to. 
+Variable references in terraform have the format `var.<name of your variable>`. In this case we have defined the variable `rg_name` in file `variables.tf`. The value of this variable is assigned in the pipeline env section ( `TF_VAR_rg_name: ${{ secrets.RG }}` ). The actual value comes from the defined secret `RG`. 
 
 More about Azure Resource Groups:
 https://docs.microsoft.com/de-de/azure/azure-resource-manager/management/manage-resource-groups-portal
@@ -326,8 +382,8 @@ To do so add the following code to `main.tf` file.
 
 ```
 resource "azurerm_app_service_plan" "sp1" {
-  name                = "<your unique service plan name>"
-  location            = data.azurerm_resource_group.wsdevops.location
+  name                = var.app_service_plan_name
+  location            = var.location
   resource_group_name = data.azurerm_resource_group.wsdevops.name
   kind                = "Linux"
   reserved            = true
@@ -339,6 +395,7 @@ resource "azurerm_app_service_plan" "sp1" {
 }
 
 ```
+Again we use variables to used our defined values for `name` and `location`. The name of the resource group is now referenced via the previously defined data object. 
 
 More about Azure App Service Plan:
 
@@ -352,8 +409,8 @@ https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/
 
 ## App Service
 
-For the App Service Definition we need a Site Configuration of "NODE|10-lts". As name we use the value of the secret that was passed as input variable.  
-Variable references in terraform have the format `var.<name of your variable>`.
+For the App Service Definition we need a Site Configuration of "NODE|10-lts". As `name` and and `location` we use the values of the secrets that were passed as input variables.  
+
 
 The Website Content will be added later over a second Pipeline.
 
@@ -362,7 +419,7 @@ To do so add the following code to `main.tf` file.
 ```
 resource "azurerm_app_service" "website" {
   name                = var.web_app_name
-  location            = data.azurerm_resource_group.wsdevops.location
+  location            = var.location
   resource_group_name = data.azurerm_resource_group.wsdevops.name
   app_service_plan_id = azurerm_app_service_plan.sp1.id
 
@@ -389,11 +446,11 @@ To do so go to the ",Actions" tab. GitHub Actions are disabled by default in you
 
 <br><img src="./images/Workflow_Enable.png" width="800"/><br>
 
-Now you see a typical master detail screen with the avilable workflows on the left-hand side. Select the "infra" workflow and click on the "Run workflow" button. In the screenshot previous runs existed already. Click on run to see the results or for troubleshooting.
+Now you see a typical main detail screen with the available workflows on the left-hand side. Select the "Terraform" workflow and click on the "Run workflow" button. In the screenshot previous runs existed already. Click on run to see the results or for troubleshooting.
 
 <br><img src="./images/Workflow_Run.PNG" width="800"/><br>
 
-For troubleshooting just click on the name "infra" next to the icon error icon. The "infra" run at the bottom of the previous screenshot for instance. The next two screenshots show the remeining two levels until you hit the details.
+For troubleshooting just click on the name "Terraform" next to the icon error icon. The "Terraform" run at the bottom of the previous screenshot for instance. The next two screenshots show the remaining two levels until you hit the details.
 
 <br><img src="./images/wkf_trouble_1.png" width="800"/><br>
 <br><img src="./images/wkf_trouble_2.png" width="800"/><br>

@@ -16,10 +16,10 @@ Running the workflow is done the same way as in the infrastructure case.
 As stated you don't have to code something anymore. However, our major point is know-how transfer and not just typing. Therefore below a few comments what the YAML file`.github/workflows/azure_webapp.yml` is actually doing.
 
 ```
-# File: .github/workflows/workflow.yml
+# File: .github/workflows/azure_webapp.yml
 
 on: 
-  workflow_dispatch:
+  workflow_dispatch
 
 name: app
 
@@ -29,7 +29,7 @@ jobs:
     steps:
     # checkout the repo
     - name: 'Checkout Github Action' 
-      uses: actions/checkout@master
+      uses: actions/checkout@v3
       
     - name: Setup Node 10.x
       uses: actions/setup-node@v1
@@ -42,16 +42,18 @@ jobs:
         npm install
         npm run build --if-present
         npm run test --if-present
+
     - name: Azure Login
       uses: azure/login@v1
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        creds: '{"clientId":"${{ secrets.AZURE_AD_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_AD_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_AD_TENANT_ID }}"}'
 
     - name: 'Azure webapp deploy'
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ secrets.WEBAPP }}
         package:  ${{ github.workspace }}/app
+
 ```
 
 The file can be broken down into three major activities:
