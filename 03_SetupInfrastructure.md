@@ -108,7 +108,7 @@ The code file can be split in three major parts:
 
 * Destroy Terraform resources (destroy)
   
-  _This step is implemented as a GitHub Actions job named `terraformdetroy`._
+  _This step is implemented as a GitHub Actions job named `terraformdestroy`._
 
 ### Workflow Header
 
