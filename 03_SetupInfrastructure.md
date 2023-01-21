@@ -232,10 +232,10 @@ The setup from the second job is not much different from the first one. Only the
 
 
 
-The second job needs to wait until the first one completed. Sequential execution is enforced by `needs: [terraform]`. Additionally it is only running, if workflow parameter `destroy` is not activated (`if: ${{ github.event.inputs.destroy == 'false' }}`) when starting the workflow. 
+The second job needs to wait until the first one completed. Sequential execution is enforced by `needs: [terraformprepare]`. Additionally it is only running, if workflow parameter `destroy` is not activated (`if: ${{ github.event.inputs.destroy == 'false' }}`) when starting the workflow. 
 The parameter `-auto-approve` in `terraform apply -auto-approve` ensures that your workflow is not hanging because terraform expects a manual confirmation from the user.
 
-Finally the third job `terraformdetroy` removes all azure resources created by your terraform code. Destroying the deployed infrastructure is achieved by calling `terraform destroy`
+Finally the third job `terraformdestroy` removes all azure resources created by your terraform code. Destroying the deployed infrastructure is achieved by calling `terraform destroy`
 
 ```
 ...
