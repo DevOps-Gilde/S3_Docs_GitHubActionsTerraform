@@ -6,12 +6,14 @@ This repo contains the documentation for the **third session** within this DevOp
 
 ## Prerequirements
 
+The only mandatory prerequisite is your own GitHub repo.
+
 The following prerequisites are **ONLY REQUIRED** if you don't use in place browser editing:
 - Git Client: [download link](https://git-scm.com/download/)
 - Visual Studio Code: [download link](
 https://code.visualstudio.com/download)
 
-## Session preparation/
+## Session preparation
 
 We strongly recommend that you carry out the tasks below before the hackathon session starts. It helps you to maximize the time for coding:
 
