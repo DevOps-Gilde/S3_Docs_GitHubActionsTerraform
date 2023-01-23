@@ -112,7 +112,8 @@ The code file can be split in three major parts:
 
 ### Workflow Header
 
-This includes the name (`name`) of the flow, passing our secrets as environment variables (`env`) and the condition under which our worklow is triggered (`on` which specifies manual start). When starting the workflow manually you can control enable the input field `destroy`.
+This includes the name (`name`) of the flow, passing our secrets as environment variables (`env`) and the condition under which our worklow is triggered (`on` which specifies manual start).
+When starting the workflow manually you can control enable the input field `destroy`. As stated you must fill out the values. If you don't use the predefined full solution use `main` as branch. `Destroy Resources` is only required as part f your last run when you want to clean up. Thanks to the built-in update functionality terraform only runs the delta in case of an update.
 ```
 name: 'Terraform'
  
