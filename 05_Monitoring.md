@@ -119,7 +119,7 @@ The result of the query should output the simplified number of failed requests n
 In reality you have to monitor a lot of places. A dashboard gives you a chance to collect all relevant information in a single place. We will now integrate our query now in a first example dashboard.
 From terraform perspective a dashboard is just another resource. The complete layout along with its content is stored as JSON in one of the resource properties. The JSON is internal. Hardcoding the content like queries and other settings would make the code hard to maintain. Therefore, we have to implement two steps:
 1. Template for the dashboard
-2. Creating dashboard resource and assign template with values
+2. Creating dashboard resource and assign template with values in your existing `main.tf` file
 
 **Regarding template)**
 
@@ -127,7 +127,7 @@ We created already a file `dashboard.tpl` that contains the internal JSON. We ad
 The code below now shows how you can make the JSON available for later use:
 ```
 data "template_file" "dash-template" {
-  template = "${file("${path.module}/dashboard.tpl")}"
+  template = file("${path.module}/dashboard.tpl")
   vars = {
     api_name = azurerm_application_insights.appi.name
     rg_name  = data.azurerm_resource_group.wsdevops.name
@@ -149,7 +149,7 @@ Note the following interesting points:
 Now we can reference the template file in the dashboard resource as follows. As above use a unique prefix since you are all working in the same resource group:
 ```
 resource "azurerm_dashboard" "my-board" {
-  name                = "<your prefix>-dasboard"
+  name                = "<your prefix>-dashboard"
   resource_group_name = data.azurerm_resource_group.wsdevops.name
   location            = data.azurerm_resource_group.wsdevops.location
   tags = {
@@ -160,4 +160,4 @@ resource "azurerm_dashboard" "my-board" {
 ```
 `data.template_file.dash-template` follows the usual pattern to reference existing resources (data = since existing; type = template_file; dash-template = user specified name). `Rendered` is the property name defined by terraform to retrieve the JSON with the replaced values.
 
-There are multiple ways to open the dashboard you created. One way is to open the resource group. There you should have an entry for your dashboard `<your prefix>-dashboard`. Click on the entry. In the overview page you have a link as shown below that taks you directly to your dashboard.
+There are multiple ways to open the dashboard you created. One way is to open the resource group `ws-devops` in the portal. There you should have an entry for your dashboard `<your prefix>-dashboard`. Click on the entry. In the overview page you have a link as shown below that taks you directly to your dashboard.
