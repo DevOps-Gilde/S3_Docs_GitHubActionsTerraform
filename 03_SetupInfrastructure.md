@@ -33,7 +33,7 @@ We all work in the same resource group and that's why we need naming conventions
 
 The full resource name for the app service plan could then be `plan-flopet631`. The following paragraphs list the secrets (Key-value pairs) you have to define. Click the "New repository secret" button as described above and confirm:
 
-### AZURE_CREDENTIALS - Azure connection details
+### AZURE_AD_XXX/ AZURE_SUBSCRIPTION_ID - Azure connection details
 
 This is the Connection Data needed for the Azure Subscription. The hashtags are placeholders. Copy the values from the teams chat (They are not given to avoid exposure of secrets in the public internet).
 
