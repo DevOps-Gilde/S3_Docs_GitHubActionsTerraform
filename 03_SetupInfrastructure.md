@@ -88,7 +88,7 @@ https://docs.microsoft.com/en-us/azure/app-service/overview
 
 There is no way to display the secret value via the browser UI. As you can see in the screenshot below there is no view button.
 
-<br><img src="./images/secrets_no_view.png" width="900"/>
+<br><img src="./images/secrets_no_view.png" width="1248"/>
 
 However, we included a special debug step named `debug secrets` that outputs the secrets during a workflow run. The next chapter explains how the magic works.
 
