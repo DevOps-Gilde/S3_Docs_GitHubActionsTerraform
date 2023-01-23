@@ -6,8 +6,6 @@ This repo contains the documentation for the **third session** within this DevOp
 
 ## Prerequirements
 
-The only mandatory prerequisite is your own GitHub account.
-
 The following prerequisites are **ONLY REQUIRED** if you don't use in place browser editing:
 - Git Client: [download link](https://git-scm.com/download/)
 - Visual Studio Code: [download link](
