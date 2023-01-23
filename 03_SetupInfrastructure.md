@@ -410,7 +410,7 @@ https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/
 
 ## App Service
 
-For the App Service Definition we need a Site Configuration of "NODE|10-lts". As `name` and and `location` we use the values of the secrets that were passed as input variables.  
+For the App Service Definition we need a Site Configuration of "NODE|16-lts". As `name` and and `location` we use the values of the secrets that were passed as input variables.  
 
 
 The Website Content will be added later over a second Pipeline.
@@ -425,7 +425,7 @@ resource "azurerm_app_service" "website" {
   app_service_plan_id = azurerm_app_service_plan.sp1.id
 
   site_config {
-    linux_fx_version = "NODE|10-lts"
+    linux_fx_version = "NODE|16-lts"
     scm_type         = "LocalGit"
   }
 }
@@ -447,11 +447,13 @@ To do so go to the ",Actions" tab. GitHub Actions are disabled by default in you
 
 <br><img src="./images/Workflow_Enable.png" width="800"/><br>
 
-Now you see a typical main detail screen with the available workflows on the left-hand side. Select the "Terraform" workflow and click on the "Run workflow" button. In the screenshot previous runs existed already. Click on run to see the results or for troubleshooting.
+Now you see a typical main detail screen with the available workflows on the left-hand side. Select the "Terraform" workflow and click on the "Run workflow" button. Changing the defaults is only required in the following cases:
+* You want to clean up the created terraform resources because it is your last run (otherwise we will do it for you)
+* You want to run the predefined solution which is located in the `solution` branch
 
 <br><img src="./images/Workflow_Run.PNG" width="800"/><br>
 
-For troubleshooting just click on the name "Terraform" next to the icon error icon. The "Terraform" run at the bottom of the previous screenshot for instance. The next two screenshots show the remaining two levels until you hit the details.
+In the screenshot previous runs existed already without an error. In case of an error you have an error icon instead of a green checkmark. For troubleshooting just click on the name "Terraform" next to the icon error icon. The next two screenshots show the remaining two levels until you hit the details.
 
 <br><img src="./images/wkf_trouble_1.png" width="800"/><br>
 <br><img src="./images/wkf_trouble_2.png" width="800"/><br>
