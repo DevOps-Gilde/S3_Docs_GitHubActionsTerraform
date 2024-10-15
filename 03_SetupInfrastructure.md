@@ -375,7 +375,7 @@ https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/
 
 In the Next Step you define your desired Azure App Service Plan
 
-For Location and Resource Group Name we use the previus gathered information from the Resource Group Data Definition.
+For Location and Resource Group Name we use the previous gathered information from the Resource Group Data Definition.
 
 For our example we want a Linux App Service Plan with the SKU STANDARD S1
 
