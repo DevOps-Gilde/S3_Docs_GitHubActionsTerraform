@@ -280,8 +280,8 @@ The name of the placeholder `<your unique name>` needs to be unique for every pa
 terraform {
   backend "azurerm" {
     resource_group_name  = "ws-devops"
-    storage_account_name = "cgmsgtf"
-    container_name       = "tfstateazdevops"
+    storage_account_name = "devopshackathontfstate"
+    container_name       = "tfstate"
     key                  = "<your unique name>.tfstate"
   }
 }
