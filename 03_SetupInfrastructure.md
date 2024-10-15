@@ -410,7 +410,7 @@ https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/
 
 ## App Service
 
-For the App Service Definition we need a Site Configuration of "NODE|16-lts". As `name` and and `location` we use the values of the secrets that were passed as input variables.  
+For the App Service Definition we need a Site Configuration of "NODE|22-lts". As `name` and and `location` we use the values of the secrets that were passed as input variables.  
 
 
 The Website Content will be added later over a second Pipeline.
@@ -425,7 +425,7 @@ resource "azurerm_app_service" "website" {
   app_service_plan_id = azurerm_app_service_plan.sp1.id
 
   site_config {
-    linux_fx_version = "NODE|16-lts"
+    linux_fx_version = "NODE|22-lts"
     scm_type         = "LocalGit"
   }
 }
