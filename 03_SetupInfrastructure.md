@@ -396,7 +396,7 @@ resource "azurerm_app_service_plan" "sp1" {
 }
 
 ```
-Again we use variables to used our defined values for `name` and `location`. The name of the resource group is now referenced via the previously defined data object. 
+Again, we use variables to apply the defined values for `name` and `location`. The name of the resource group is now referenced via the previously defined data object. 
 
 More about Azure App Service Plan:
 
