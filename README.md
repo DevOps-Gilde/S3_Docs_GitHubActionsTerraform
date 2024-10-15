@@ -7,7 +7,7 @@ This repo contains the documentation for the **third session** within this DevOp
 ## Prerequirements
 
 The following prerequisites are **ONLY REQUIRED** if you don't use in place browser editing:
-- Git Client: [download link](https://git-scm.com/download/)
+- Git Client: [download link](https://git-scm.com/downloads/)
 - Visual Studio Code: [download link](
 https://code.visualstudio.com/download)
 
