@@ -23,7 +23,7 @@ Our YAML file will reference various things such as names for azure service inst
 
 ## Create GitHub Secrets
 
-To create secrets you first have to navigate to the right place in GitHub (Tab Settings => Entry "Actions" under Secrets => Button "New repository secret").
+To create secrets you first have to navigate to the right place in GitHub (Tab Settings => Secrets and Variables => "Actions" => Button "New repository secret").
 
 <br><img src="./images/secrets_path_to_enter.png" width="900"/>
 
